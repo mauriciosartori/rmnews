@@ -12,7 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.sartori.rmnews.ui.main.MainScreen
+import com.sartori.rmnews.ui.navigation.NewsNavHost
 import com.sartori.rmnews.ui.main.MainScreenViewModel
 import com.sartori.rmnews.ui.theme.RMNewsTheme
 
@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MainScreen(
+                    NewsNavHost(
                         uiState = uiState,
                         onRetry = viewModel::loadNewsFeed,
                         onRefresh = viewModel::loadNewsFeed,

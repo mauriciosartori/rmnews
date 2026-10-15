@@ -3,4 +3,5 @@
     <string name="retry">Retry</string>
     <string name="refresh_failed">Could not refresh. Pull down to try again.</string>
     <string name="no_news">No news available. Pull down to refresh.</string>
+    <string name="back">Back</string>
 </resources>

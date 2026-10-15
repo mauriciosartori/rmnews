@@ -1,5 +1,7 @@
 package com.sartori.rmnews.ui.main
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +32,7 @@ fun MainScreen(
     uiState: MainScreenUiState,
     onRetry: () -> Unit,
     onRefresh: () -> Unit,
+    onArticleClick: (Article) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -65,7 +68,7 @@ fun MainScreen(
                         onRefresh = onRefresh,
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        NewsList(uiState.news)
+                        NewsList(uiState.news, onArticleClick)
                     }
                 }
             }
@@ -91,7 +94,7 @@ fun MainScreen(
 }
 
 @Composable
-fun NewsList(articles: List<Article>) {
+fun NewsList(articles: List<Article>, onArticleClick: (Article) -> Unit) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -104,14 +107,14 @@ fun NewsList(articles: List<Article>) {
             key = { _, article -> article.url }
         ) { index, article ->
             if (index > 0) HorizontalDivider()
-            ArticleRow(article = article)
+            ArticleRow(article = article, onClick = { onArticleClick(article) })
         }
     }
 }
 
 @Composable
-fun ArticleRow(article: Article) {
-    Column() {
+fun ArticleRow(article: Article, onClick: () -> Unit) {
+    Column(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
         Text(article.title)
         Text(article.sourceName ?: "N/A")
         Box(contentAlignment = Alignment.CenterEnd) {
@@ -128,7 +131,8 @@ private fun MainScreenPreview() {
         MainScreen(
             uiState = MainScreenUiState.Loading,
             onRetry = {},
-            onRefresh = {}
+            onRefresh = {},
+            onArticleClick = {}
         )
     }
 }
@@ -140,7 +144,8 @@ private fun MainScreenErrorPreview() {
         MainScreen(
             uiState = MainScreenUiState.Error("Unable to load news."),
             onRetry = {},
-            onRefresh = {}
+            onRefresh = {},
+            onArticleClick = {}
         )
     }
 }
