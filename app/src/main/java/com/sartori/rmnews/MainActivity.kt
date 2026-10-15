@@ -29,6 +29,8 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     MainScreen(
                         uiState = uiState,
+                        onRetry = viewModel::loadNewsFeed,
+                        onRefresh = viewModel::loadNewsFeed,
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding)

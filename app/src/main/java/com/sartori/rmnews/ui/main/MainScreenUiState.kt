@@ -4,12 +4,16 @@ import com.sartori.rmnews.domain.model.Article
 
 /**
  * UI state exposed by [MainScreenViewModel] and rendered by [MainScreen].
- * Loading state controls the screen's progress indicator.
+ * Initial loading replaces content; refresh state keeps the current news visible.
  */
 sealed interface MainScreenUiState {
     data object Loading : MainScreenUiState
 
-    data class Success(val news: List<Article>) : MainScreenUiState
+    data class Content(
+        val news: List<Article>,
+        val isRefreshing: Boolean = false,
+        val refreshFailed: Boolean = false
+    ) : MainScreenUiState
 
     data class Error(val message: String) : MainScreenUiState
 }

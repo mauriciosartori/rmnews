@@ -7,10 +7,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,9 +24,12 @@ import com.sartori.rmnews.R
 import com.sartori.rmnews.domain.model.Article
 import com.sartori.rmnews.ui.theme.RMNewsTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     uiState: MainScreenUiState,
+    onRetry: () -> Unit,
+    onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -45,12 +51,39 @@ fun MainScreen(
                 }
             }
 
-            is MainScreenUiState.Success -> {
-                NewsList(uiState.news)
+            is MainScreenUiState.Content -> {
+                Column(modifier = Modifier.weight(1f)) {
+                    if (uiState.refreshFailed) {
+                        Text(
+                            text = stringResource(R.string.refresh_failed),
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                    }
+                    PullToRefreshBox(
+                        isRefreshing = uiState.isRefreshing,
+                        onRefresh = onRefresh,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        NewsList(uiState.news)
+                    }
+                }
             }
 
             is MainScreenUiState.Error -> {
-                Text(uiState.message)
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(
+                        16.dp,
+                        Alignment.CenterVertically
+                    ),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("Andas de mono de jade")
+                    Button(onClick = onRetry) {
+                        Text(stringResource(R.string.retry))
+                    }
+                }
             }
 
         }
@@ -59,7 +92,13 @@ fun MainScreen(
 
 @Composable
 fun NewsList(articles: List<Article>) {
-    LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        if (articles.isEmpty()) {
+            item { Text(stringResource(R.string.no_news)) }
+        }
         itemsIndexed(
             items = articles,
             key = { _, article -> article.url }
@@ -87,7 +126,21 @@ fun ArticleRow(article: Article) {
 private fun MainScreenPreview() {
     RMNewsTheme {
         MainScreen(
-            uiState = MainScreenUiState.Loading
+            uiState = MainScreenUiState.Loading,
+            onRetry = {},
+            onRefresh = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MainScreenErrorPreview() {
+    RMNewsTheme {
+        MainScreen(
+            uiState = MainScreenUiState.Error("Unable to load news."),
+            onRetry = {},
+            onRefresh = {}
         )
     }
 }
