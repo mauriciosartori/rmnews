@@ -1,5 +1,7 @@
 package com.sartori.rmnews.di
 
+import com.sartori.rmnews.BuildConfig
+import javax.inject.Named
 import com.sartori.rmnews.data.remote.NewsApi
 import dagger.Module
 import dagger.Provides
@@ -12,6 +14,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+    @Provides
+    @Named("newsApiKey")
+    fun provideNewsApiKey(): String = BuildConfig.NEWS_API_KEY
+
     @Provides
     @Singleton
     fun provideRetrofit(): Retrofit = Retrofit.Builder()

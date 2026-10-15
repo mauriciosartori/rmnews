@@ -1,9 +1,21 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
 }
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+val newsApiKey = localProperties.getProperty("NEWS_API_KEY", "")
+    .replace("\\", "\\\\")
+    .replace("\"", "\\\"")
+    .replace("\n", "\\n")
+    .replace("\r", "\\r")
 
 android {
     namespace = "com.sartori.rmnews"
@@ -17,6 +29,7 @@ android {
         applicationId = "com.sartori.rmnews"
         minSdk = 26
         targetSdk = 36
+        buildConfigField("String", "NEWS_API_KEY", "\"$newsApiKey\"")
         versionCode = 1
         versionName = "1.0"
 
@@ -36,6 +49,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 

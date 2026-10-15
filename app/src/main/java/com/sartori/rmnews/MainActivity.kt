@@ -1,6 +1,7 @@
 package com.sartori.rmnews
 
 import android.os.Bundle
+import dagger.hilt.android.AndroidEntryPoint
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -15,6 +16,7 @@ import com.sartori.rmnews.ui.main.MainScreen
 import com.sartori.rmnews.ui.main.MainScreenViewModel
 import com.sartori.rmnews.ui.theme.RMNewsTheme
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
