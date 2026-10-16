@@ -33,6 +33,7 @@ class DefaultNewsRepositoryTest {
         }
         val result = DefaultNewsRepository(api, "test-key").getTopHeadlines(page = 2, query = " science ")
         assertEquals(42, result.totalResults)
+        assertEquals(3, result.receivedCount)
         assertEquals(1, result.articles.size)
         assertEquals("Headline", result.articles.single().title)
         assertEquals("Source", result.articles.single().sourceName)

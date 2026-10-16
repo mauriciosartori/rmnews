@@ -101,8 +101,12 @@ class MainScreenViewModelTest {
     private class PendingRepository : NewsRepository {
         var pending = CompletableDeferred<HeadlinesPage>()
         var calls = 0
+        val pages = mutableListOf<Int>()
+        val queries = mutableListOf<String?>()
         override suspend fun getTopHeadlines(page: Int, pageSize: Int, query: String?): HeadlinesPage {
             calls++
+            pages += page
+            queries += query
             return pending.await()
         }
     }

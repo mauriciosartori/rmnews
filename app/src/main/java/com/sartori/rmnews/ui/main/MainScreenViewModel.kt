@@ -3,6 +3,7 @@ package com.sartori.rmnews.ui.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sartori.rmnews.domain.repository.NewsRepository
+import com.sartori.rmnews.domain.model.HeadlinesPage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.time.Duration
@@ -45,16 +46,55 @@ class MainScreenViewModel @Inject constructor(
     }
 
     fun loadNewsFeed() {
-        if (loadJob?.isActive == true) return
+        if (loadJob?.isActive == true) {
+            if ((_uiState.value as? MainScreenUiState.Content)?.isLoadingMore != true) return
+            loadJob?.cancel()
+        }
         requestNews(keepContent = true)
     }
+
+    fun loadNextPage() {
+        val content = _uiState.value as? MainScreenUiState.Content ?: return
+        if (!content.canLoadMore || content.isRefreshing || loadJob?.isActive == true) return
+        val page = content.currentPage + 1
+        val query = _searchQuery.value.trim().takeIf { it.isNotEmpty() }
+        _uiState.value = content.copy(isLoadingMore = true, loadMoreFailed = false)
+        loadJob = viewModelScope.launch {
+            try {
+                val result = newsRepository.getTopHeadlines(
+                    page = page,
+                    pageSize = PAGE_SIZE,
+                    query = query
+                )
+                ensureActive()
+                _uiState.value = content.copy(
+                    news = (content.news + result.articles).distinctBy { it.url },
+                    currentPage = page,
+                    canLoadMore = result.hasNextPage(page),
+                    isLoadingMore = false,
+                    loadMoreFailed = false
+                )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                ensureActive()
+                _uiState.value = content.copy(isLoadingMore = false, loadMoreFailed = true)
+            }
+        }
+    }
+
+    // Use server pagination, not the deduplicated/filtered list size, to find the end.
+    private fun HeadlinesPage.hasNextPage(page: Int): Boolean =
+        receivedCount > 0 && page.toLong() * PAGE_SIZE < totalResults
 
     private fun requestNews(
         keepContent: Boolean,
         debounceDuration: Duration = Duration.ZERO
     ) {
         val query = _searchQuery.value.trim().takeIf { it.isNotEmpty() }
-        val previousContent = if (keepContent) _uiState.value as? MainScreenUiState.Content else null
+        val previousContent = if (keepContent) {
+            (_uiState.value as? MainScreenUiState.Content)?.copy(isLoadingMore = false, loadMoreFailed = false)
+        } else null
         _uiState.value = previousContent?.copy(
             isRefreshing = true,
             refreshFailed = false
@@ -63,9 +103,12 @@ class MainScreenViewModel @Inject constructor(
         loadJob = viewModelScope.launch {
             try {
                 delay(debounceDuration)
-                val articles = newsRepository.getTopHeadlines(page = 1, query = query).articles
+                val result = newsRepository.getTopHeadlines(page = 1, pageSize = PAGE_SIZE, query = query)
                 ensureActive()
-                _uiState.value = MainScreenUiState.Content(articles)
+                _uiState.value = MainScreenUiState.Content(
+                    news = result.articles.distinctBy { it.url },
+                    canLoadMore = result.hasNextPage(1)
+                )
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -78,5 +121,8 @@ class MainScreenViewModel @Inject constructor(
                 )
             }
         }
+    }
+    private companion object {
+        const val PAGE_SIZE = 10
     }
 }

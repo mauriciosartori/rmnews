@@ -34,6 +34,7 @@ class MainActivity : ComponentActivity() {
                         onSearchQueryChanged = viewModel::onSearchQueryChanged,
                         onRetry = viewModel::loadNewsFeed,
                         onRefresh = viewModel::loadNewsFeed,
+                        onLoadMore = viewModel::loadNextPage,
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding)

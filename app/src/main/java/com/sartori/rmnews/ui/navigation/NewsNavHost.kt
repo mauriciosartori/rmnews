@@ -18,6 +18,7 @@ fun NewsNavHost(
     onSearchQueryChanged: (String) -> Unit,
     onRetry: () -> Unit,
     onRefresh: () -> Unit,
+    onLoadMore: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -29,6 +30,7 @@ fun NewsNavHost(
                 onSearchQueryChanged = onSearchQueryChanged,
                 onRetry = onRetry,
                 onRefresh = onRefresh,
+                onLoadMore = onLoadMore,
                 onArticleClick = { article ->
                     navController.navigate(article.toDetailRoute()) {
                         launchSingleTop = true

@@ -39,7 +39,8 @@ class DefaultNewsRepository @Inject constructor(
         }
         return HeadlinesPage(
             articles = response.articles.mapNotNull { it.toArticleOrNull() },
-            totalResults = response.totalResults
+            totalResults = response.totalResults,
+            receivedCount = response.articles.size
         )
     }
 }

@@ -9,6 +9,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Button
@@ -38,6 +42,7 @@ fun MainScreen(
     onRetry: () -> Unit,
     onRefresh: () -> Unit,
     onArticleClick: (Article) -> Unit,
+    onLoadMore: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -75,7 +80,7 @@ fun MainScreen(
             }
 
             is MainScreenUiState.Content -> {
-                if (uiState.news.isEmpty() && searchQuery.isNotBlank()) {
+                if (uiState.news.isEmpty() && !uiState.canLoadMore && searchQuery.isNotBlank()) {
                     EmptySearchResults(
                         query = searchQuery.trim(),
                         onClearSearch = { onSearchQueryChanged("") },
@@ -95,7 +100,7 @@ fun MainScreen(
                             onRefresh = onRefresh,
                             modifier = Modifier.fillMaxSize()
                         ) {
-                            NewsList(uiState.news, onArticleClick)
+                            NewsList(uiState, onArticleClick, onLoadMore)
                         }
                     }
                 }
@@ -148,12 +153,30 @@ private fun EmptySearchResults(
 }
 
 @Composable
-fun NewsList(articles: List<Article>, onArticleClick: (Article) -> Unit) {
+fun NewsList(
+    content: MainScreenUiState.Content,
+    onArticleClick: (Article) -> Unit,
+    onLoadMore: () -> Unit
+) {
+    val articles = content.news
+    val listState = rememberLazyListState()
+    LaunchedEffect(listState, content, onLoadMore) {
+        if (!content.canLoadMore || content.isRefreshing || content.isLoadingMore || content.loadMoreFailed) {
+            return@LaunchedEffect
+        }
+        snapshotFlow {
+            val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+            lastVisible >= (articles.size - 3).coerceAtLeast(0)
+        }.distinctUntilChanged().collect { nearEnd ->
+            if (nearEnd) onLoadMore()
+        }
+    }
     LazyColumn(
+        state = listState,
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        if (articles.isEmpty()) {
+        if (articles.isEmpty() && !content.canLoadMore) {
             item { Text(stringResource(R.string.no_news)) }
         }
         itemsIndexed(
@@ -162,6 +185,22 @@ fun NewsList(articles: List<Article>, onArticleClick: (Article) -> Unit) {
         ) { index, article ->
             if (index > 0) HorizontalDivider()
             ArticleRow(article = article, onClick = { onArticleClick(article) })
+        }
+        if (content.canLoadMore) {
+            item(key = "pagination_footer") {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    if (content.loadMoreFailed) {
+                        Text(stringResource(R.string.load_more_failed))
+                        Button(onClick = onLoadMore) { Text(stringResource(R.string.retry)) }
+                    } else if (content.isLoadingMore) {
+                        CircularProgressIndicator()
+                    }
+                }
+            }
         }
     }
 }

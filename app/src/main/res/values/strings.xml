@@ -15,4 +15,5 @@
     <string name="no_search_results">No headlines found for “%1$s”.</string>
     <string name="no_search_results_hint">Try different keywords or clear your search.</string>
     <string name="clear_search_action">Clear search</string>
+    <string name="load_more_failed">Could not load more headlines. Please try again.</string>
 </resources>

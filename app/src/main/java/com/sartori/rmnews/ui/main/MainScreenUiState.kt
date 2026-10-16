@@ -12,7 +12,11 @@ sealed interface MainScreenUiState {
     data class Content(
         val news: List<Article>,
         val isRefreshing: Boolean = false,
-        val refreshFailed: Boolean = false
+        val refreshFailed: Boolean = false,
+        val currentPage: Int = 1,
+        val canLoadMore: Boolean = false,
+        val isLoadingMore: Boolean = false,
+        val loadMoreFailed: Boolean = false
     ) : MainScreenUiState
 
     data class Error(val message: String) : MainScreenUiState
