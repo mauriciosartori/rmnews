@@ -5,5 +5,6 @@ data class Article(
     val url: String,
     val sourceName: String?,
     val publishedAt: String?,
-    val description: String?
+    val description: String?,
+    val formattedPublishedDate: String? = null
 )

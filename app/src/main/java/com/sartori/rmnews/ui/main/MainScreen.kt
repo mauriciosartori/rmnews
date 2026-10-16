@@ -118,7 +118,7 @@ fun ArticleRow(article: Article, onClick: () -> Unit) {
         Text(article.title)
         Text(article.sourceName ?: "N/A")
         Box(contentAlignment = Alignment.CenterEnd) {
-            Text(article.publishedAt ?: "N/A")
+            Text(article.formattedPublishedDate ?: stringResource(R.string.date_unavailable))
         }
     }
 

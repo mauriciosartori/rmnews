@@ -12,12 +12,12 @@ data class DetailRoute(
     val title: String,
     val url: String,
     val sourceName: String? = null,
-    val publishedAt: String? = null
+    val formattedPublishedDate: String? = null
 )
 
 fun Article.toDetailRoute(): DetailRoute = DetailRoute(
     title = title,
     url = url,
     sourceName = sourceName,
-    publishedAt = publishedAt
+    formattedPublishedDate = formattedPublishedDate
 )

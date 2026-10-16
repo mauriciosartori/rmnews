@@ -38,7 +38,7 @@ fun NewsNavHost(
                 title = route.title,
                 url = route.url,
                 sourceName = route.sourceName,
-                publishedAt = route.publishedAt,
+                formattedPublishedDate = route.formattedPublishedDate,
                 onBack = { navController.popBackStack() }
             )
         }

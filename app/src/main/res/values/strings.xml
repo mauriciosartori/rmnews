@@ -4,4 +4,10 @@
     <string name="refresh_failed">Could not refresh. Pull down to try again.</string>
     <string name="no_news">No news available. Pull down to refresh.</string>
     <string name="back">Back</string>
+    <string name="article_source">Source: %1$s</string>
+    <string name="article_published">Published: %1$s</string>
+    <string name="source_unavailable">Unknown source</string>
+    <string name="date_unavailable">Date unavailable</string>
+    <string name="read_full_article">Read full article</string>
+    <string name="article_link_error">Unable to open this article. Check that a browser is available and try again.</string>
 </resources>

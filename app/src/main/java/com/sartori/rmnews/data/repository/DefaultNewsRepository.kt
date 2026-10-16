@@ -1,5 +1,6 @@
 package com.sartori.rmnews.data.repository
 
+import com.sartori.rmnews.data.mapper.formatPublicationDate
 import com.sartori.rmnews.domain.repository.NewsRepository
 import com.sartori.rmnews.data.remote.NewsApi
 import com.sartori.rmnews.data.remote.dto.ArticleDto
@@ -49,6 +50,7 @@ private fun ArticleDto.toArticleOrNull(): Article? {
         url = url,
         sourceName = source?.name,
         publishedAt = publishedAt,
-        description = description
+        description = description,
+        formattedPublishedDate = formatPublicationDate(publishedAt)
     )
 }
