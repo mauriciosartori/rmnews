@@ -17,4 +17,6 @@
     <string name="no_search_results_hint">Try different keywords or clear your search.</string>
     <string name="clear_search_action">Clear search</string>
     <string name="load_more_failed">Could not load more headlines. Please try again.</string>
+    <string name="show_search">Show search</string>
+    <string name="hide_search">Hide search</string>
 </resources>

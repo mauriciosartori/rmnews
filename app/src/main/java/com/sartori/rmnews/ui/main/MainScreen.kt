@@ -1,13 +1,28 @@
 package com.sartori.rmnews.ui.main
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,19 +48,45 @@ fun MainScreen(
     onLoadMore: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    var isSearchVisible by rememberSaveable { mutableStateOf(searchQuery.isNotBlank()) }
+    val focusManager = LocalFocusManager.current
+
     Column(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = stringResource(R.string.news_feed_title),
-            style = MaterialTheme.typography.titleLarge
-        )
-        NewsSearchField(
-            query = searchQuery,
-            onQueryChanged = onSearchQueryChanged,
-            modifier = Modifier.fillMaxWidth()
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.news_feed_title),
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.weight(1f)
+            )
+            IconButton(onClick = {
+                if (isSearchVisible) focusManager.clearFocus()
+                isSearchVisible = !isSearchVisible
+            }) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_search),
+                    contentDescription = stringResource(
+                        if (isSearchVisible) R.string.hide_search else R.string.show_search
+                    )
+                )
+            }
+        }
+        AnimatedVisibility(
+            visible = isSearchVisible,
+            enter = expandVertically() + fadeIn(),
+            exit = shrinkVertically() + fadeOut()
+        ) {
+            NewsSearchField(
+                query = searchQuery,
+                onQueryChanged = onSearchQueryChanged,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
         when (uiState) {
             MainScreenUiState.Loading -> NewsLoading(modifier = Modifier.fillMaxSize())
             is MainScreenUiState.Content -> {
