@@ -38,8 +38,8 @@ fun MainScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = stringResource(R.string.app_name),
-            style = MaterialTheme.typography.headlineMedium
+            text = stringResource(R.string.news_feed_title),
+            style = MaterialTheme.typography.titleLarge
         )
         NewsSearchField(
             query = searchQuery,

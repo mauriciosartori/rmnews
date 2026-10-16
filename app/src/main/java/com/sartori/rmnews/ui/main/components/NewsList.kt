@@ -1,17 +1,16 @@
 package com.sartori.rmnews.ui.main.components
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,16 +46,16 @@ internal fun NewsList(
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        contentPadding = PaddingValues(vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         if (articles.isEmpty() && !content.canLoadMore) {
             item { Text(stringResource(R.string.no_news)) }
         }
-        itemsIndexed(
+        items(
             items = articles,
-            key = { _, article -> article.url }
-        ) { index, article ->
-            if (index > 0) HorizontalDivider()
+            key = { article -> article.url }
+        ) { article ->
             ArticleRow(article = article, onClick = { onArticleClick(article) })
         }
         if (content.canLoadMore) {

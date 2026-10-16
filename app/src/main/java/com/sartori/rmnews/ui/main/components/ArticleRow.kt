@@ -1,7 +1,6 @@
 package com.sartori.rmnews.ui.main.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,54 +29,58 @@ import com.sartori.rmnews.ui.theme.RMNewsTheme
 
 @Composable
 internal fun ArticleRow(article: Article, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.Top
+    ElevatedCard(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth()
     ) {
-        val placeholder = painterResource(R.drawable.ic_article_placeholder)
-        AsyncImage(
-            model = article.imageUrl,
-            contentDescription = null,
-            placeholder = placeholder,
-            error = placeholder,
-            fallback = placeholder,
-            contentScale = ContentScale.Crop,
+        Row(
             modifier = Modifier
-                .size(88.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-        )
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.Top
         ) {
-            Text(
-                text = article.title,
-                style = MaterialTheme.typography.titleMedium,
-                minLines = 2,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+            val placeholder = painterResource(R.drawable.ic_article_placeholder)
+            AsyncImage(
+                model = article.imageUrl,
+                contentDescription = null,
+                placeholder = placeholder,
+                error = placeholder,
+                fallback = placeholder,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(88.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)
             )
-            Text(
-                article.sourceName ?: stringResource(R.string.source_unavailable),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                text = article.formattedPublishedDate ?: stringResource(R.string.date_unavailable),
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.End,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = article.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    minLines = 2,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    article.sourceName ?: stringResource(R.string.source_unavailable),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = article.formattedPublishedDate ?: stringResource(R.string.date_unavailable),
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.End,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }
