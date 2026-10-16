@@ -1,5 +1,6 @@
 package com.sartori.rmnews.ui.main
 
+import com.sartori.rmnews.analytics.NewsAnalytics
 import com.sartori.rmnews.domain.model.Article
 import com.sartori.rmnews.domain.model.HeadlinesPage
 import com.sartori.rmnews.domain.repository.NewsRepository
@@ -32,7 +33,7 @@ class MainScreenViewModelTest {
     @Test
     fun refreshKeepsContentAndIgnoresRepeatedRequests() = runTest(dispatcher) {
         val repository = PendingRepository()
-        val viewModel = MainScreenViewModel(repository)
+        val viewModel = MainScreenViewModel(repository, RecordingAnalytics())
         runCurrent()
         repository.pending.complete(HeadlinesPage(listOf(article), 1))
         runCurrent()
@@ -56,7 +57,7 @@ class MainScreenViewModelTest {
     @Test
     fun failedRefreshPreservesContentAndCanBeRetried() = runTest(dispatcher) {
         val repository = PendingRepository()
-        val viewModel = MainScreenViewModel(repository)
+        val viewModel = MainScreenViewModel(repository, RecordingAnalytics())
         runCurrent()
         repository.pending.complete(HeadlinesPage(listOf(article), 1))
         runCurrent()
@@ -83,7 +84,7 @@ class MainScreenViewModelTest {
     @Test
     fun initialFailureUsesErrorAndRetryUsesLoading() = runTest(dispatcher) {
         val repository = PendingRepository()
-        val viewModel = MainScreenViewModel(repository)
+        val viewModel = MainScreenViewModel(repository, RecordingAnalytics())
         runCurrent()
         repository.pending.completeExceptionally(IOException("Offline"))
         runCurrent()
@@ -96,6 +97,14 @@ class MainScreenViewModelTest {
         repository.pending.complete(HeadlinesPage(listOf(article), 1))
         runCurrent()
         assertEquals(MainScreenUiState.Content(listOf(article)), viewModel.uiState.value)
+    }
+
+    private class RecordingAnalytics : NewsAnalytics {
+        val searches = mutableListOf<String>()
+        override fun trackSearch(query: String) { searches += query }
+        override fun trackArticleOpened(title: String) = Unit
+        override fun trackRefresh() = Unit
+        override fun trackFullArticleClicked(title: String) = Unit
     }
 
     private class PendingRepository : NewsRepository {

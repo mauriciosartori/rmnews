@@ -1,6 +1,8 @@
 package com.sartori.rmnews
 
 import android.os.Bundle
+import com.sartori.rmnews.analytics.NewsAnalytics
+import javax.inject.Inject
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,6 +20,8 @@ import com.sartori.rmnews.ui.theme.RMNewsTheme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject lateinit var newsAnalytics: NewsAnalytics
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -33,7 +37,12 @@ class MainActivity : ComponentActivity() {
                         searchQuery = searchQuery,
                         onSearchQueryChanged = viewModel::onSearchQueryChanged,
                         onRetry = viewModel::loadNewsFeed,
-                        onRefresh = viewModel::loadNewsFeed,
+                        onRefresh = {
+                            newsAnalytics.trackRefresh()
+                            viewModel.loadNewsFeed()
+                        },
+                        onArticleOpened = newsAnalytics::trackArticleOpened,
+                        onFullArticleClicked = newsAnalytics::trackFullArticleClicked,
                         onLoadMore = viewModel::loadNextPage,
                         modifier = Modifier
                             .fillMaxSize()

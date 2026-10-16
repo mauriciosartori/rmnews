@@ -19,6 +19,8 @@ fun NewsNavHost(
     onRetry: () -> Unit,
     onRefresh: () -> Unit,
     onLoadMore: () -> Unit,
+    onArticleOpened: (String) -> Unit,
+    onFullArticleClicked: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -32,6 +34,7 @@ fun NewsNavHost(
                 onRefresh = onRefresh,
                 onLoadMore = onLoadMore,
                 onArticleClick = { article ->
+                    onArticleOpened(article.title)
                     navController.navigate(article.toDetailRoute()) {
                         launchSingleTop = true
                     }
@@ -45,7 +48,8 @@ fun NewsNavHost(
                 url = route.url,
                 sourceName = route.sourceName,
                 formattedPublishedDate = route.formattedPublishedDate,
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onReadFullArticle = { onFullArticleClicked(route.title) }
             )
         }
     }

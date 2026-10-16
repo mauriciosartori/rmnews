@@ -39,6 +39,7 @@ fun DetailScreen(
     sourceName: String?,
     formattedPublishedDate: String?,
     onBack: () -> Unit,
+    onReadFullArticle: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -76,6 +77,7 @@ fun DetailScreen(
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
+                onReadFullArticle()
                 linkFailed = false
                 val uri = Uri.parse(url)
                 if (uri.scheme?.lowercase() !in setOf("https", "http") || uri.host.isNullOrBlank()) {

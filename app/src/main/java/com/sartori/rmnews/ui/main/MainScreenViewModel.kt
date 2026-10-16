@@ -1,5 +1,6 @@
 package com.sartori.rmnews.ui.main
 
+import com.sartori.rmnews.analytics.NewsAnalytics
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sartori.rmnews.domain.repository.NewsRepository
@@ -18,7 +19,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
-    private val newsRepository: NewsRepository
+    private val newsRepository: NewsRepository,
+    private val newsAnalytics: NewsAnalytics
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<MainScreenUiState>(MainScreenUiState.Loading)
     val uiState = _uiState.asStateFlow()
@@ -41,6 +43,7 @@ class MainScreenViewModel @Inject constructor(
         loadJob?.cancel()
         requestNews(
             keepContent = false,
+            trackSearch = true,
             debounceDuration = if (value.isBlank()) Duration.ZERO else 1100.milliseconds
         )
     }
@@ -89,7 +92,8 @@ class MainScreenViewModel @Inject constructor(
 
     private fun requestNews(
         keepContent: Boolean,
-        debounceDuration: Duration = Duration.ZERO
+        debounceDuration: Duration = Duration.ZERO,
+        trackSearch: Boolean = false
     ) {
         val query = _searchQuery.value.trim().takeIf { it.isNotEmpty() }
         val previousContent = if (keepContent) {
@@ -103,6 +107,7 @@ class MainScreenViewModel @Inject constructor(
         loadJob = viewModelScope.launch {
             try {
                 delay(debounceDuration)
+                if (trackSearch && query != null) newsAnalytics.trackSearch(query)
                 val result = newsRepository.getTopHeadlines(page = 1, pageSize = PAGE_SIZE, query = query)
                 ensureActive()
                 _uiState.value = MainScreenUiState.Content(
