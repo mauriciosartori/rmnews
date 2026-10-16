@@ -20,10 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.foundation.layout.Row
-import androidx.compose.ui.Alignment
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +32,7 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sartori.rmnews.R
@@ -48,8 +45,8 @@ fun DetailScreen(
     url: String,
     sourceName: String?,
     formattedPublishedDate: String?,
-    onBack: () -> Unit,
     imageUrl: String? = null,
+    description: String? = null,
     onReadFullArticle: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -58,88 +55,90 @@ fun DetailScreen(
     val publicationDate = formattedPublishedDate
         ?: stringResource(R.string.date_unavailable)
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+    Column(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            IconButton(onClick = onBack) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_arrow_back),
-                    contentDescription = stringResource(R.string.back)
+            val placeholder = painterResource(R.drawable.ic_article_placeholder)
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = null,
+                placeholder = placeholder,
+                error = placeholder,
+                fallback = placeholder,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(16f / 9f)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+            )
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.semantics { heading() }
+            )
+
+            Text(
+                text = stringResource(R.string.article_published, publicationDate),
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            description?.trim()?.takeIf { it.isNotEmpty() }?.let { articleDescription ->
+                Text(
+                    text = articleDescription,
+                    style = MaterialTheme.typography.bodyLarge
                 )
             }
             Text(
-                text = stringResource(R.string.news_feed_title),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.weight(1f)
+                text = stringResource(
+                    R.string.article_source,
+                    sourceName?.takeIf { it.isNotBlank() } ?: stringResource(R.string.source_unavailable)
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.End,
+                style = MaterialTheme.typography.titleMedium
             )
         }
-        val placeholder = painterResource(R.drawable.ic_article_placeholder)
-        AsyncImage(
-            model = imageUrl,
-            contentDescription = null,
-            placeholder = placeholder,
-            error = placeholder,
-            fallback = placeholder,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(16f / 9f)
-                .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-        )
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.semantics { heading() }
-        )
-        Text(
-            text = stringResource(
-                R.string.article_source,
-                sourceName?.takeIf { it.isNotBlank() } ?: stringResource(R.string.source_unavailable)
-            ),
-            style = MaterialTheme.typography.titleMedium
-        )
-        Text(
-            text = stringResource(R.string.article_published, publicationDate),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {
-                onReadFullArticle()
-                linkFailed = false
-                val uri = Uri.parse(url)
-                if (uri.scheme?.lowercase() !in setOf("https", "http") || uri.host.isNullOrBlank()) {
-                    linkFailed = true
-                } else {
-                    try {
-                        context.startActivity(Intent(Intent.ACTION_VIEW, uri))
-                    } catch (_: ActivityNotFoundException) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            if (linkFailed) {
+                Text(
+                    text = stringResource(R.string.article_link_error),
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
+                )
+            }
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    onReadFullArticle()
+                    linkFailed = false
+                    val uri = Uri.parse(url)
+                    if (uri.scheme?.lowercase() !in setOf("https", "http") || uri.host.isNullOrBlank()) {
                         linkFailed = true
-                    } catch (_: SecurityException) {
-                        linkFailed = true
+                    } else {
+                        try {
+                            context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+                        } catch (_: ActivityNotFoundException) {
+                            linkFailed = true
+                        } catch (_: SecurityException) {
+                            linkFailed = true
+                        }
                     }
                 }
+            ) {
+                Text(stringResource(R.string.read_full_article))
             }
-        ) {
-            Text(stringResource(R.string.read_full_article))
-        }
-        if (linkFailed) {
-            Text(
-                text = stringResource(R.string.article_link_error),
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
-            )
         }
     }
 }
@@ -153,7 +152,7 @@ private fun DetailScreenPreview() {
             url = "https://example.com/article",
             sourceName = "Example News",
             formattedPublishedDate = "Oct 15, 2026, 5:00 AM",
-            onBack = {}
+            description = "Researchers are exploring new ways to make renewable energy more accessible and efficient."
         )
     }
 }
@@ -166,8 +165,7 @@ private fun DetailScreenMissingMetadataPreview() {
             title = "Example headline",
             url = "https://example.com/article",
             sourceName = null,
-            formattedPublishedDate = null,
-            onBack = {}
+            formattedPublishedDate = null
         )
     }
 }
