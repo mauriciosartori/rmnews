@@ -14,9 +14,10 @@ class DefaultNewsRepositoryTest {
     fun mapsUsableArticlesAndPreservesServerTotal() = runBlocking {
         val api = object : NewsApi {
             override suspend fun getTopHeadlines(
-                apiKey: String, country: String, page: Int, pageSize: Int
+                apiKey: String, country: String, page: Int, pageSize: Int, query: String?
             ): HeadlinesResponseDto {
                 assertEquals("test-key", apiKey)
+                assertEquals("science", query)
                 assertEquals(2, page)
                 assertEquals(20, pageSize)
                 return HeadlinesResponseDto(
@@ -30,7 +31,7 @@ class DefaultNewsRepositoryTest {
                 )
             }
         }
-        val result = DefaultNewsRepository(api, "test-key").getTopHeadlines(page = 2)
+        val result = DefaultNewsRepository(api, "test-key").getTopHeadlines(page = 2, query = " science ")
         assertEquals(42, result.totalResults)
         assertEquals(1, result.articles.size)
         assertEquals("Headline", result.articles.single().title)
@@ -42,7 +43,7 @@ class DefaultNewsRepositoryTest {
         runBlocking {
             val api = object : NewsApi {
                 override suspend fun getTopHeadlines(
-                    apiKey: String, country: String, page: Int, pageSize: Int
+                    apiKey: String, country: String, page: Int, pageSize: Int, query: String?
                 ): HeadlinesResponseDto = throw IOException("No connection")
             }
             DefaultNewsRepository(api, "test-key").getTopHeadlines()

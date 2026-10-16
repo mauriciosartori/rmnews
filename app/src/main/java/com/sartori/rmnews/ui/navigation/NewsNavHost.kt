@@ -14,6 +14,8 @@ import com.sartori.rmnews.ui.main.MainScreenUiState
 @Composable
 fun NewsNavHost(
     uiState: MainScreenUiState,
+    searchQuery: String,
+    onSearchQueryChanged: (String) -> Unit,
     onRetry: () -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
@@ -23,6 +25,8 @@ fun NewsNavHost(
         composable<MainRoute> {
             MainScreen(
                 uiState = uiState,
+                searchQuery = searchQuery,
+                onSearchQueryChanged = onSearchQueryChanged,
                 onRetry = onRetry,
                 onRefresh = onRefresh,
                 onArticleClick = { article ->

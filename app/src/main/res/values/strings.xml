@@ -2,7 +2,7 @@
     <string name="app_name">RM News</string>
     <string name="retry">Retry</string>
     <string name="refresh_failed">Could not refresh. Pull down to try again.</string>
-    <string name="no_news">No news available. Pull down to refresh.</string>
+    <string name="no_news">No headlines available right now. Pull down to refresh.</string>
     <string name="back">Back</string>
     <string name="article_source">Source: %1$s</string>
     <string name="article_published">Published: %1$s</string>
@@ -10,4 +10,9 @@
     <string name="date_unavailable">Date unavailable</string>
     <string name="read_full_article">Read full article</string>
     <string name="article_link_error">Unable to open this article. Check that a browser is available and try again.</string>
+    <string name="search_headlines">Search headlines</string>
+    <string name="clear_search">Clear</string>
+    <string name="no_search_results">No headlines found for “%1$s”.</string>
+    <string name="no_search_results_hint">Try different keywords or clear your search.</string>
+    <string name="clear_search_action">Clear search</string>
 </resources>

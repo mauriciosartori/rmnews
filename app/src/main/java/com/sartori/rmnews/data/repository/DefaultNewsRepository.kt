@@ -21,7 +21,8 @@ class DefaultNewsRepository @Inject constructor(
      */
     override suspend fun getTopHeadlines(
         page: Int,
-        pageSize: Int
+        pageSize: Int,
+        query: String?
     ): HeadlinesPage {
         require(page >= 1) { "Page must start at 1." }
         require(pageSize in 1..100) { "Page size must be between 1 and 100." }
@@ -30,7 +31,8 @@ class DefaultNewsRepository @Inject constructor(
         val response = newsApi.getTopHeadlines(
             apiKey = apiKey,
             page = page,
-            pageSize = pageSize
+            pageSize = pageSize,
+            query = query?.trim()?.takeIf { it.isNotEmpty() }
         )
         if (response.status != "ok") {
             throw IOException("NewsAPI returned an unsuccessful response.")

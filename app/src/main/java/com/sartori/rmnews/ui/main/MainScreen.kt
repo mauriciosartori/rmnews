@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sartori.rmnews.R
@@ -30,6 +33,8 @@ import com.sartori.rmnews.ui.theme.RMNewsTheme
 @Composable
 fun MainScreen(
     uiState: MainScreenUiState,
+    searchQuery: String,
+    onSearchQueryChanged: (String) -> Unit,
     onRetry: () -> Unit,
     onRefresh: () -> Unit,
     onArticleClick: (Article) -> Unit,
@@ -44,6 +49,21 @@ fun MainScreen(
             style = MaterialTheme.typography.headlineMedium
         )
 
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = onSearchQueryChanged,
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text(stringResource(R.string.search_headlines)) },
+            singleLine = true,
+            trailingIcon = {
+                if (searchQuery.isNotEmpty()) {
+                    TextButton(onClick = { onSearchQueryChanged("") }) {
+                        Text(stringResource(R.string.clear_search))
+                    }
+                }
+            }
+        )
+
         when (uiState) {
             MainScreenUiState.Loading -> {
                 Box(
@@ -55,20 +75,28 @@ fun MainScreen(
             }
 
             is MainScreenUiState.Content -> {
-                Column(modifier = Modifier.weight(1f)) {
-                    if (uiState.refreshFailed) {
-                        Text(
-                            text = stringResource(R.string.refresh_failed),
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                    }
-                    PullToRefreshBox(
-                        isRefreshing = uiState.isRefreshing,
-                        onRefresh = onRefresh,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        NewsList(uiState.news, onArticleClick)
+                if (uiState.news.isEmpty() && searchQuery.isNotBlank()) {
+                    EmptySearchResults(
+                        query = searchQuery.trim(),
+                        onClearSearch = { onSearchQueryChanged("") },
+                        modifier = Modifier.weight(1f).fillMaxWidth()
+                    )
+                } else {
+                    Column(modifier = Modifier.weight(1f)) {
+                        if (uiState.refreshFailed) {
+                            Text(
+                                text = stringResource(R.string.refresh_failed),
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        }
+                        PullToRefreshBox(
+                            isRefreshing = uiState.isRefreshing,
+                            onRefresh = onRefresh,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            NewsList(uiState.news, onArticleClick)
+                        }
                     }
                 }
             }
@@ -82,13 +110,39 @@ fun MainScreen(
                     ),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Andas de mono de jade")
+                    Text(uiState.message)
                     Button(onClick = onRetry) {
                         Text(stringResource(R.string.retry))
                     }
                 }
             }
 
+        }
+    }
+}
+
+@Composable
+private fun EmptySearchResults(
+    query: String,
+    onClearSearch: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(R.string.no_search_results, query),
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center
+        )
+        Text(
+            text = stringResource(R.string.no_search_results_hint),
+            textAlign = TextAlign.Center
+        )
+        Button(onClick = onClearSearch) {
+            Text(stringResource(R.string.clear_search_action))
         }
     }
 }
@@ -130,6 +184,8 @@ private fun MainScreenPreview() {
     RMNewsTheme {
         MainScreen(
             uiState = MainScreenUiState.Loading,
+            searchQuery = "",
+            onSearchQueryChanged = {},
             onRetry = {},
             onRefresh = {},
             onArticleClick = {}
@@ -143,9 +199,27 @@ private fun MainScreenErrorPreview() {
     RMNewsTheme {
         MainScreen(
             uiState = MainScreenUiState.Error("Unable to load news."),
+            searchQuery = "",
+            onSearchQueryChanged = {},
             onRetry = {},
             onRefresh = {},
             onArticleClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 640)
+@Composable
+private fun MainScreenEmptySearchPreview() {
+    RMNewsTheme {
+        MainScreen(
+            uiState = MainScreenUiState.Content(emptyList()),
+            searchQuery = "mexico",
+            onSearchQueryChanged = {},
+            onRetry = {},
+            onRefresh = {},
+            onArticleClick = {},
+            modifier = Modifier.fillMaxSize()
         )
     }
 }

@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -100,7 +101,7 @@ class MainScreenViewModelTest {
     private class PendingRepository : NewsRepository {
         var pending = CompletableDeferred<HeadlinesPage>()
         var calls = 0
-        override suspend fun getTopHeadlines(page: Int, pageSize: Int): HeadlinesPage {
+        override suspend fun getTopHeadlines(page: Int, pageSize: Int, query: String?): HeadlinesPage {
             calls++
             return pending.await()
         }

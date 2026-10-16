@@ -25,10 +25,13 @@ class MainActivity : ComponentActivity() {
             RMNewsTheme {
                 val viewModel: MainScreenViewModel = viewModel()
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     NewsNavHost(
                         uiState = uiState,
+                        searchQuery = searchQuery,
+                        onSearchQueryChanged = viewModel::onSearchQueryChanged,
                         onRetry = viewModel::loadNewsFeed,
                         onRefresh = viewModel::loadNewsFeed,
                         modifier = Modifier
