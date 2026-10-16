@@ -54,6 +54,7 @@ private fun ArticleDto.toArticleOrNull(): Article? {
         sourceName = source?.name,
         publishedAt = publishedAt,
         description = description,
-        formattedPublishedDate = formatPublicationDate(publishedAt)
+        formattedPublishedDate = formatPublicationDate(publishedAt),
+        imageUrl = urlToImage?.trim()?.takeIf { it.isNotEmpty() }
     )
 }

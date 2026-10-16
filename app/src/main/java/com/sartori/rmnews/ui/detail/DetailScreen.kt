@@ -3,6 +3,13 @@ package com.sartori.rmnews.ui.detail
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import coil3.compose.AsyncImage
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,6 +46,7 @@ fun DetailScreen(
     sourceName: String?,
     formattedPublishedDate: String?,
     onBack: () -> Unit,
+    imageUrl: String? = null,
     onReadFullArticle: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -57,6 +65,20 @@ fun DetailScreen(
         TextButton(onClick = onBack) {
             Text(stringResource(R.string.back))
         }
+        val placeholder = painterResource(R.drawable.ic_article_placeholder)
+        AsyncImage(
+            model = imageUrl,
+            contentDescription = null,
+            placeholder = placeholder,
+            error = placeholder,
+            fallback = placeholder,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(16f / 9f)
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+        )
         Text(
             text = title,
             style = MaterialTheme.typography.headlineMedium,

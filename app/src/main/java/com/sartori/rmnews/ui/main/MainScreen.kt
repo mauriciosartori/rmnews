@@ -1,6 +1,14 @@
 package com.sartori.rmnews.ui.main
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import coil3.compose.AsyncImage
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -207,14 +215,59 @@ fun NewsList(
 
 @Composable
 fun ArticleRow(article: Article, onClick: () -> Unit) {
-    Column(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
-        Text(article.title)
-        Text(article.sourceName ?: "N/A")
-        Box(contentAlignment = Alignment.CenterEnd) {
-            Text(article.formattedPublishedDate ?: stringResource(R.string.date_unavailable))
+    Row(
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        val placeholder = painterResource(R.drawable.ic_article_placeholder)
+        AsyncImage(
+            model = article.imageUrl,
+            contentDescription = null,
+            placeholder = placeholder,
+            error = placeholder,
+            fallback = placeholder,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(88.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+        )
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(article.title, style = MaterialTheme.typography.titleMedium)
+            Text(
+                article.sourceName ?: stringResource(R.string.source_unavailable),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                article.formattedPublishedDate ?: stringResource(R.string.date_unavailable),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
+}
 
+@Preview(showBackground = true, widthDp = 360)
+@Composable
+private fun ArticleRowPreview() {
+    RMNewsTheme {
+        ArticleRow(
+            article = Article(
+                title = "A new discovery brings fresh possibilities for renewable energy",
+                url = "https://example.com/article",
+                sourceName = "Example News",
+                publishedAt = null,
+                description = null,
+                formattedPublishedDate = "Oct 16, 2026, 9:00 AM"
+            ),
+            onClick = {}
+        )
+    }
 }
 
 @Preview(showBackground = true)

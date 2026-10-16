@@ -48,6 +48,7 @@ fun NewsNavHost(
                 url = route.url,
                 sourceName = route.sourceName,
                 formattedPublishedDate = route.formattedPublishedDate,
+                imageUrl = route.imageUrl,
                 onBack = { navController.popBackStack() },
                 onReadFullArticle = { onFullArticleClicked(route.title) }
             )
