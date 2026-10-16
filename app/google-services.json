@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "211260895999",
+    "project_id": "rm-news-feed",
+    "storage_bucket": "rm-news-feed.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:211260895999:android:374d16aace465430d2d2ca",
+        "android_client_info": {
+          "package_name": "com.sartori.rmnews"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRS9Dc8YuYK6BjqAre6ejXzQZvSeb_ODk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
