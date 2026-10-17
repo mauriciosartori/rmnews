@@ -48,6 +48,7 @@ internal fun NewsTopBar(
             IconButton(onClick = onBack, enabled = isDetail) {
                 Icon(
                     painter = painterResource(R.drawable.ic_arrow_back),
+                    tint = MaterialTheme.colorScheme.primary,
                     contentDescription = stringResource(R.string.back)
                 )
             }
@@ -55,6 +56,7 @@ internal fun NewsTopBar(
         Text(
             text = stringResource(R.string.news_feed_title),
             style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.weight(1f),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
@@ -67,6 +69,7 @@ internal fun NewsTopBar(
             IconButton(onClick = onToggleSearch, enabled = !isDetail) {
                 Icon(
                     painter = painterResource(R.drawable.ic_search),
+                    tint = MaterialTheme.colorScheme.primary,
                     contentDescription = stringResource(
                         if (isSearchVisible) R.string.hide_search else R.string.show_search
                     )

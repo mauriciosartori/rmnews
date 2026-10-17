@@ -1,5 +1,7 @@
 package com.sartori.rmnews.ui.main.components
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -20,6 +22,12 @@ internal fun NewsSearchField(
         modifier = modifier,
         label = { Text(stringResource(R.string.search_headlines)) },
         singleLine = true,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.primary
+        ),
         trailingIcon = {
             if (query.isNotEmpty()) {
                 TextButton(onClick = { onQueryChanged("") }) {

@@ -60,6 +60,7 @@ internal fun ArticleRow(article: Article, onClick: () -> Unit) {
                 Text(
                     text = article.title,
                     style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
                     minLines = 2,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
