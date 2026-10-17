@@ -2,6 +2,12 @@
 
 Android news reader built for the RM case study. The app fetches US headlines from NewsAPI, supports keyword searches and pagination, and opens the original article in a browser.
 
+## Screenshots
+
+| News feed | Article detail | Dark mode |
+| :---: | :---: | :---: |
+| <img src="docs/screenshots/news-feed.png" alt="News feed with headline cards" width="240"> | <img src="docs/screenshots/article-detail.png" alt="Article detail in light mode" width="240"> | <img src="docs/screenshots/article-detail-dark.png" alt="Article detail in dark mode" width="240"> |
+
 ## Features
 
 - Headline cards with images, source and publication date.
