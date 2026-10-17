@@ -5,6 +5,11 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -27,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.heading
@@ -51,6 +57,7 @@ fun DetailScreen(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val scrimFadeHeight = with(LocalDensity.current) { 32.dp.toPx() }
     var linkFailed by remember(url) { mutableStateOf(false) }
     val publicationDate = formattedPublishedDate
         ?: stringResource(R.string.date_unavailable)
@@ -65,24 +72,52 @@ fun DetailScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             val placeholder = painterResource(R.drawable.ic_article_placeholder)
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = null,
-                placeholder = placeholder,
-                error = placeholder,
-                fallback = placeholder,
-                contentScale = ContentScale.Crop,
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(16f / 9f)
                     .clip(RoundedCornerShape(16.dp))
                     .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-            )
-            Text(
-                text = title,
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.semantics { heading() }
-            )
+            ) {
+                // The image fills the larger of the default photo area and the full title.
+                Spacer(Modifier.fillMaxWidth().aspectRatio(16f / 9f))
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = null,
+                    placeholder = placeholder,
+                    error = placeholder,
+                    fallback = placeholder,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.matchParentSize()
+                )
+                Box(
+                    modifier = Modifier.matchParentSize().background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.15f))
+                        )
+                    )
+                )
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color.White,
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .fillMaxWidth()
+                        .padding(top = 48.dp)
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    Color.Black.copy(alpha = 0.25f),
+                                    Color.Black.copy(alpha = 0.45f)
+                                ),
+                                endY = scrimFadeHeight
+                            )
+                        )
+                        .padding(start = 16.dp, end = 16.dp, top = 32.dp, bottom = 16.dp)
+                        .semantics { heading() }
+                )
+            }
 
             Text(
                 text = stringResource(R.string.article_published, publicationDate),
